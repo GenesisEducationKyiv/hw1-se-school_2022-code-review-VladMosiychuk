@@ -18,7 +18,6 @@ Use `.env.example` as a refference.
 You can leave SMTP settings empty but you won't be able to send any emails.
 
 ```bash
-VERSION=1.0.0
 HOSTNAME=localhost
 DB_PATH=db
 EMAILS_FN=subscribers.txt

@@ -6,7 +6,7 @@ const DB_PATH = process.env?.DB_PATH ?? 'db'
 const EMAILS_FN = process.env?.EMAILS_FN ?? 'subscribers.txt'
 
 export default {
-  VERSION: process.env?.VERSION ?? '1.0.0',
+  VERSION: require('../package.json').version,
   HOSTNAME: process.env?.HOSTNAME ?? 'localhost',
   DB_PATH: DB_PATH,
   EMAILS_FN: `${DB_PATH}/${EMAILS_FN}`,
