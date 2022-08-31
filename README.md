@@ -28,6 +28,7 @@ SMTP_PORT=_YOUR_SMTP_PORT_
 SMTP_SECURE=_SECURE_true/false_
 SMTP_USER=_SMTP_USER_EMAIL_
 SMTP_PASS=_SMTP_USER_PASSWORD_
+BINANCE_API_URL=https://api.binance.com/api/v3/ticker/price?symbol=BTCUAH
 ```
 
 ## Step 2: Build and Run Application
