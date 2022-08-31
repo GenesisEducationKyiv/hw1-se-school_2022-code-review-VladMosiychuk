@@ -1,7 +1,7 @@
 import cors from 'cors'
-import routes from './routes'
 import config from './config'
-import swaggerDocs from './utils/swagger'
+import useRoutes from './routes'
+import useSwaggerDocs from './utils/swagger'
 import express, { Express } from 'express'
 
 const app: Express = express()
@@ -14,10 +14,9 @@ app.use(cors({
   origin: '*'
 }))
 
+useRoutes(app)
+useSwaggerDocs(app)
+
 app.listen(config.PORT, async () => {
   console.log(`⚡️[sever]: Server is running at http://${config.HOSTNAME}:${config.PORT}`)
-
-  routes(app)
-
-  swaggerDocs(app)
 })

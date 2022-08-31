@@ -15,7 +15,7 @@ import {
   SubscriberSchema
 } from './schema/email.schema'
 
-function routes(app: Express) {
+function useRoutes(app: Express) {
 
   app.get('/', async (req: Request, res: Response) => res.redirect('/docs'))
 
@@ -80,4 +80,4 @@ function routes(app: Express) {
   app.post('/api/sendEmails', sendEmailsHandler)
 }
 
-export default routes
+export default useRoutes

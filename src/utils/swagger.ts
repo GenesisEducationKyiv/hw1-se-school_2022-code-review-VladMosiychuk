@@ -18,7 +18,7 @@ const options: jsdoc.Options = {
 
 const swaggerSpec: object = jsdoc(options)
 
-function swaggerDocs(app: Express) {
+function useSwaggerDocs(app: Express) {
 
   app.use('/docs', ui.serve, ui.setup(swaggerSpec))
 
@@ -30,4 +30,4 @@ function swaggerDocs(app: Express) {
   console.log(`🔎[swagger]: API Docs available at http://${config.HOSTNAME}:${config.PORT}/docs`)
 }
 
-export default swaggerDocs
+export default useSwaggerDocs
