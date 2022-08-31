@@ -1,4 +1,4 @@
-import { AnyZodObject } from 'zod'
+import { ZodError, AnyZodObject } from 'zod'
 import { StatusCodes } from 'http-status-codes'
 import { Request, Response, NextFunction } from 'express'
 
@@ -7,8 +7,12 @@ const validate = function (schema: AnyZodObject) {
     try {
       schema.parse({ body: req.body, query: req.query, params: req.params })
       next()
-    } catch (e: any) {
-      return res.status(StatusCodes.BAD_REQUEST).send(e.errors)
+    } catch (err) {
+      if (err instanceof ZodError) {
+        return res.status(StatusCodes.BAD_REQUEST).send(err.errors)
+      } else {
+        return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR)
+      }
     }
   }
 }
