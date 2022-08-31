@@ -1,5 +1,5 @@
 import nodemailer, { Transporter } from 'nodemailer'
-import { MailOptions } from 'nodemailer/lib/smtp-transport'
+import SMTPTransport, { MailOptions } from 'nodemailer/lib/smtp-transport'
 import config from '../config'
 
 async function verifyTransporter(transporter: Transporter) {
@@ -12,23 +12,7 @@ async function verifyTransporter(transporter: Transporter) {
 
 export async function getTransporter(): Promise<Transporter | null> {
 
-  // In case SMTP server is not provided, we'll use SMTP by Ethereal
-  if (!config.SMTP_HOST || config.SMTP_PORT == 0) {
-
-    console.log('No SMTP settings provided. We\'ll use test SMTP by https://ethereal.email/')
-
-    const acc = await nodemailer.createTestAccount()
-
-    config.SMTP_HOST = acc.smtp.host
-    config.SMTP_PORT = acc.smtp.port
-    config.SMTP_SECURE = acc.smtp.secure
-    config.SMTP_USER = acc.user
-    config.SMTP_PASS = acc.pass
-
-    return getTransporter()
-  }
-
-  const transporter: Transporter = nodemailer.createTransport({
+  const transporterOptions: SMTPTransport.Options = {
     host: config.SMTP_HOST,
     port: config.SMTP_PORT,
     secure: config.SMTP_SECURE,
@@ -36,7 +20,25 @@ export async function getTransporter(): Promise<Transporter | null> {
       user: config.SMTP_USER,
       pass: config.SMTP_PASS
     }
-  }, {
+  }
+
+  // In case SMTP server is not provided, we'll use SMTP by Ethereal
+  if (!config.SMTP_HOST || config.SMTP_PORT == 0) {
+
+    console.log('No SMTP settings provided. We\'ll use test SMTP by https://ethereal.email/')
+
+    const acc = await nodemailer.createTestAccount()
+
+    transporterOptions.host = acc.smtp.host
+    transporterOptions.port = acc.smtp.port
+    transporterOptions.secure = acc.smtp.secure
+    transporterOptions.auth = {
+      user: acc.user,
+      pass: acc.pass
+    }
+  }
+
+  const transporter: Transporter = nodemailer.createTransport(transporterOptions, {
     from: `"Bitcoin API" <${config.SMTP_USER}>`
   })
 
