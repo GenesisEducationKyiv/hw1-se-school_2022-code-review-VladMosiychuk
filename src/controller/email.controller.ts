@@ -1,5 +1,6 @@
 import { Transporter } from 'nodemailer'
 import { Request, Response } from 'express'
+import { StatusCodes } from 'http-status-codes'
 import { getRate } from '../service/rate.service'
 import { SubscribeInput } from '../schema/email.schema'
 import { getEmails, addNewEmail } from '../service/email.service'
@@ -13,7 +14,7 @@ export async function subscribeHandler(
 
   const isAdded: boolean = await addNewEmail(req.query.email)
 
-  return res.sendStatus(isAdded ? 200 : 409)
+  return res.sendStatus(isAdded ? StatusCodes.OK : StatusCodes.CONFLICT)
 }
 
 export async function sendEmailsHandler(req: Request, res: Response) {

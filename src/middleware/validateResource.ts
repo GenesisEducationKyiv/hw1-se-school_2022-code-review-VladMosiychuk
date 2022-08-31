@@ -1,4 +1,5 @@
 import { AnyZodObject } from 'zod'
+import { StatusCodes } from 'http-status-codes'
 import { Request, Response, NextFunction } from 'express'
 
 const validate = function (schema: AnyZodObject) {
@@ -7,7 +8,7 @@ const validate = function (schema: AnyZodObject) {
       schema.parse({ body: req.body, query: req.query, params: req.params })
       next()
     } catch (e: any) {
-      return res.status(400).send(e.errors)
+      return res.status(StatusCodes.BAD_REQUEST).send(e.errors)
     }
   }
 }
