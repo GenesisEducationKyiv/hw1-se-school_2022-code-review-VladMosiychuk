@@ -12,11 +12,11 @@ async function verifyTransporter(transporter: Transporter) {
 
 export async function getTransporter(): Promise<Transporter | null> {
 
+  // In case SMTP server is not provided, we'll use SMTP by Ethereal
   if (!config.SMTP_HOST || config.SMTP_PORT == 0) {
 
     console.log('No SMTP settings provided. We\'ll use test SMTP by https://ethereal.email/')
 
-    // Get test account and update config
     const acc = await nodemailer.createTestAccount()
 
     config.SMTP_HOST = acc.smtp.host
@@ -25,7 +25,6 @@ export async function getTransporter(): Promise<Transporter | null> {
     config.SMTP_USER = acc.user
     config.SMTP_PASS = acc.pass
 
-    // Call getTransporter once again, this time settings are provided
     return getTransporter()
   }
 

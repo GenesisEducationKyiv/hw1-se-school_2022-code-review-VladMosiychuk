@@ -1,6 +1,5 @@
 import dotenv from 'dotenv'
 
-// Load environment variables from .env file
 dotenv.config()
 
 const DB_PATH = process.env?.DB_PATH ?? 'db'
