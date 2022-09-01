@@ -1,0 +1,11 @@
+version: '3.7'
+services:
+  btc-api:
+    build: ./ 
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "$PORT:$PORT"
+    volumes:
+    - $PWD/$DB_PATH:/app/$DB_PATH
