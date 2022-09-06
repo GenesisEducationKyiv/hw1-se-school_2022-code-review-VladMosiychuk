@@ -15,6 +15,5 @@ export default {
   SMTP_PORT: parseInt(process.env?.SMTP_PORT ?? '0'),
   SMTP_SECURE: (/true/i).test(process.env?.SMTP_SECURE ?? ''),
   SMTP_USER: process.env?.SMTP_USER ?? '',
-  SMTP_PASS: process.env?.SMTP_PASS ?? '',
-  BINANCE_API_URL: process.env?.BINANCE_API_URL ?? ''
+  SMTP_PASS: process.env?.SMTP_PASS ?? ''
 }
