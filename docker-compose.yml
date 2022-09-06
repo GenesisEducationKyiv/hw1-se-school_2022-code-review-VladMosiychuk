@@ -1,6 +1,8 @@
 version: '3.7'
 services:
   btc-api:
+    image: btc-api
+    container_name: btc-api
     build: ./ 
     restart: unless-stopped
     env_file:
