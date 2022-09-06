@@ -1,6 +1,6 @@
 import nodemailer, { Transporter } from 'nodemailer'
 import SMTPTransport, { MailOptions } from 'nodemailer/lib/smtp-transport'
-import config from '../config'
+import config from '../../config'
 
 async function verifyTransporter(transporter: Transporter) {
   return new Promise<boolean>((resolve, reject) => {
@@ -45,12 +45,13 @@ export async function getTransporter(): Promise<Transporter | null> {
   return await verifyTransporter(transporter) ? transporter : null
 }
 
-export async function sendRateUpdate(transporter: Transporter, price: string, email: string) {
+export async function sendRateUpdate(transporter: Transporter, price: number, email: string) {
 
+  const formattedPrice = price.toFixed(2)
   const message: MailOptions = {
     to: email,
-    subject: `⚡ Update: The price of Bitcoin is ₴${price} now`,
-    html: `<p>Looks like a good price to buy, just ₴${price} per BTC 😁</p>
+    subject: `⚡ Update: The price of Bitcoin is ₴${formattedPrice} now`,
+    html: `<p>Looks like a good price to buy, just ₴${formattedPrice} per BTC 😁</p>
           <b>Bitcoin to the moooooon!!🚀🌕</b>`
   }
 

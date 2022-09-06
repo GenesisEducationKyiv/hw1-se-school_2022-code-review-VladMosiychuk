@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
 import { constants } from 'fs'
-import config from '../config'
+import config from '../../config'
 
 
 export async function listExists() {

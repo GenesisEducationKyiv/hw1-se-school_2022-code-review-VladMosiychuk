@@ -1,10 +1,11 @@
 import { Transporter } from 'nodemailer'
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { getRate } from '../service/rate.service'
 import { SubscribeInput } from '../schema/email.schema'
-import { getEmails, addNewEmail } from '../service/email.service'
-import { getTransporter, sendRateUpdate } from '../service/sender.service'
+import { CryptoTicker } from '../common/enums/crypto.ticker'
+import { BinanceAPIClient } from '../service/rate/rate.service'
+import { getEmails, addNewEmail } from '../service/email/email.service'
+import { getTransporter, sendRateUpdate } from '../service/sender/sender.service'
 
 
 export async function subscribeHandler(
@@ -20,7 +21,7 @@ export async function subscribeHandler(
 export async function sendEmailsHandler(req: Request, res: Response) {
 
   const emails: string[] = await getEmails()
-
+  const rateProvider = new BinanceAPIClient()
   const transporter: Transporter | null = await getTransporter()
 
   if (!transporter) {
@@ -28,7 +29,7 @@ export async function sendEmailsHandler(req: Request, res: Response) {
     return res.send({ failed: emails })
   }
 
-  const price: string = await getRate()
+  const price: number = await rateProvider.getTickerPrice(CryptoTicker.BTCUAH)
   const failed: string[] = []
 
   for (const email of emails) {
