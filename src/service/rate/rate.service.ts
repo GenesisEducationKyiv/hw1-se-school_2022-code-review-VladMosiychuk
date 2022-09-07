@@ -1,22 +1,10 @@
-import axios from 'axios'
+import { CryptoTicker } from '../../common/enums/crypto.ticker'
+import { BinanceAPIClient } from '../../providers/rate/binance.provider'
 
-interface IRateProvider {
-  getTickerPrice(ticker: string): Promise<number>
+export async function getBTCUAHRate() {
+
+  const rateProvider = new BinanceAPIClient()
+  const price: number = await rateProvider.getTickerPrice(CryptoTicker.BTCUAH)
+
+  return price
 }
-
-class BinanceAPIClient implements IRateProvider {
-
-  private static get API_BASE(): string {
-    return 'https://api.binance.com/api/v3'
-  }
-
-  async getTickerPrice(ticker: string): Promise<number> {
-
-    const requestUrl = `${BinanceAPIClient.API_BASE}/ticker/price?symbol=${ticker}`
-    const response = await axios.get(requestUrl)
-
-    return parseFloat(response.data.price)
-  }
-}
-
-export { BinanceAPIClient }
