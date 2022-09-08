@@ -1,16 +1,19 @@
 import nodemailer, { Transporter } from 'nodemailer'
 import SMTPTransport, { MailOptions } from 'nodemailer/lib/smtp-transport'
+import { SendingMailError, InvalidTransporterError } from '../../common/exceptions/exceptions'
 import config from '../../config'
 
 async function verifyTransporter(transporter: Transporter) {
-  return new Promise<boolean>((resolve, reject) => {
+  return new Promise<Transporter>((resolve, reject) => {
     transporter.verify((error, success) => {
-      error ? resolve(false) : resolve(true)
+      if (error)
+        reject(new InvalidTransporterError())
+      resolve(transporter)
     })
   })
 }
 
-export async function getTransporter(): Promise<Transporter | null> {
+export async function getTransporter(): Promise<Transporter> {
 
   const transporterOptions: SMTPTransport.Options = {
     host: config.SMTP_HOST,
@@ -42,26 +45,32 @@ export async function getTransporter(): Promise<Transporter | null> {
     from: `"Bitcoin API" <${config.SMTP_USER}>`
   })
 
-  return await verifyTransporter(transporter) ? transporter : null
+  return await verifyTransporter(transporter)
 }
 
-export async function sendRateUpdate(transporter: Transporter, price: number, email: string) {
-
-  const formattedPrice = price.toFixed(2)
-  const message: MailOptions = {
-    to: email,
-    subject: `⚡ Update: The price of Bitcoin is ₴${formattedPrice} now`,
-    html: `<p>Looks like a good price to buy, just ₴${formattedPrice} per BTC 😁</p>
-          <b>Bitcoin to the moooooon!!🚀🌕</b>`
-  }
-
-  return new Promise<boolean>((resolve, reject) => {
+export async function sendEmail(transporter: Transporter, message: MailOptions) {
+  return new Promise<void>((resolve, reject) => {
     transporter.sendMail(message, (error, info) => {
-      if (error) {
-        console.error(`Error while sending update to <${email}>: ${error.message}`)
-        resolve(false)
-      }
-      resolve(true)
+      if (error)
+        reject(new SendingMailError(message?.to as string, error.message))
+      else
+        resolve()
     })
   })
+}
+
+export async function sendRateUpdates(transporter: Transporter, price: number, emails: string[]) {
+
+  const formattedPrice = price.toFixed(2)
+  const updateSubject = `⚡ Update: The price of Bitcoin is ₴${formattedPrice} now`
+  const updateHTML = `<p>Looks like a good price to buy, just ₴${formattedPrice} per BTC 😁</p>
+        <b>Bitcoin to the moooooon!!🚀🌕</b>`
+
+  const sendingPromises = emails.map(email => sendEmail(transporter, {
+    to: email,
+    subject: updateSubject,
+    html: updateHTML
+  }))
+  
+  return Promise.allSettled(sendingPromises)
 }

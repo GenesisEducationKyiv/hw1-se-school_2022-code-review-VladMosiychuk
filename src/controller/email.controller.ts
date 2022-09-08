@@ -4,7 +4,8 @@ import { StatusCodes } from 'http-status-codes'
 import { SubscribeInput } from '../schema/email.schema'
 import { getBTCUAHRate } from '../service/rate/rate.service'
 import { getEmails, addNewEmail } from '../service/email/email.service'
-import { getTransporter, sendRateUpdate } from '../service/sender/sender.service'
+import { getTransporter, sendRateUpdates } from '../service/sender/sender.service'
+import { SendingMailError, InvalidTransporterError } from '../common/exceptions/exceptions'
 
 
 export async function subscribeHandler(
@@ -19,23 +20,20 @@ export async function subscribeHandler(
 
 export async function sendEmailsHandler(req: Request, res: Response) {
 
-  const emails: string[] = await getEmails()
-  const transporter: Transporter | null = await getTransporter()
+  try {
+    const emails: string[] = await getEmails()
+    const transporter: Transporter = await getTransporter()
+    const price: number = await getBTCUAHRate()
 
-  if (!transporter) {
-    console.log('Unable to setup smtp server for sending emails!')
-    return res.send({ failed: emails })
+    const sendingResults = await sendRateUpdates(transporter, price, emails)
+    const rejectedResults = sendingResults.filter(res => res.status == 'rejected') as PromiseRejectedResult[]
+    const failedEmails = rejectedResults.map(res => (res.reason as SendingMailError).email)
+
+    return res.send({ failed: failedEmails })
+  } catch (err) {
+    if (err instanceof InvalidTransporterError)
+      console.log('SMTP Transporter is invalid!')
+
+    return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR)
   }
-
-  const price: number = await getBTCUAHRate()
-  const failed: string[] = []
-
-  for (const email of emails) {
-    let success: boolean = await sendRateUpdate(transporter, price, email)
-
-    if (!success)
-      failed.push(email)
-  }
-
-  return res.send({ failed: failed })
 }
