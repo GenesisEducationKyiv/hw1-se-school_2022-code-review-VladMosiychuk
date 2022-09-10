@@ -1,6 +1,9 @@
 import dotenv from 'dotenv'
 
-dotenv.config()
+if (process.env?.ENV_FILE)
+  dotenv.config({path: process.env.ENV_FILE})
+else
+  dotenv.config()
 
 const DB_PATH = process.env?.DB_PATH ?? 'db'
 const EMAILS_FN = process.env?.EMAILS_FN ?? 'subscribers.txt'
